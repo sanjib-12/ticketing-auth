@@ -20,17 +20,26 @@ interface UserDoc extends mongoose.Document{
 }
 
 const userSchema = new mongoose.Schema({
-   email:{
-      type: String,
-      required: true
+      email:{
+         type: String,
+         required: true
+      },
+      password:{
+         type: String,
+         required:true
+      },
    },
-   password:{
-      type: String,
-      required:true
-   },
-
-
-});
+   {
+      toJSON: {
+         transform(doc, ret){          // this will transform the data that will be send as a response during the api Calls
+            ret.id = ret._id;          // passing the < id  >  in place of < _id > to maintain overall standard of the api
+            delete ret._id;            // deleting all other properties which we don't want in the api response.
+            delete ret.password;
+            delete ret.__v;
+         }
+      }
+   }
+);
 
 userSchema.pre('save', async function(done){
    if(this.isDirectModified('password')){
